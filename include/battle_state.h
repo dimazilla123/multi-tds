@@ -17,6 +17,7 @@ public:
 private:
     sf::View view;
     ECS::EntityId player = -1;
+    ECS::EntityManager Entities;
 };
 
 #endif

@@ -13,32 +13,32 @@ const int TITLE = 16;
 
 const int VIEW_RANGE = 10;
 
-void create_unit(float x, float y)
+void create_unit(ECS::EntityManager &Entities, float x, float y)
 {
-    ECS::EntityId unit = ECS::Entities.newEntity();
-    auto gc = ECS::Entities.addComponent<GraphicsComponent>(unit);
+    ECS::EntityId unit = Entities.newEntity();
+    auto gc = Entities.addComponent<GraphicsComponent>(unit);
     gc->setTextureName("unit");
     gc->setFileName("img/unit.png");
-    auto pc = ECS::Entities.addComponent<PositionComponent>(unit, x, y, 0);
+    auto pc = Entities.addComponent<PositionComponent>(unit, x, y, 0);
 }
 
-void create_wall(float x, float y)
+void create_wall(ECS::EntityManager &Entities, float x, float y)
 {
-    ECS::EntityId unit = ECS::Entities.newEntity();
-    auto gc = ECS::Entities.addComponent<GraphicsComponent>(unit);
+    ECS::EntityId unit = Entities.newEntity();
+    auto gc = Entities.addComponent<GraphicsComponent>(unit);
     gc->setTextureName("wall");
     gc->setFileName("img/wall.png");
-    auto pc = ECS::Entities.addComponent<PositionComponent>(unit, x, y, 0);
+    auto pc = Entities.addComponent<PositionComponent>(unit, x, y, 0);
 }
 
-void create_player(float x, float y)
+void create_player(ECS::EntityManager &Entities, float x, float y)
 {
-    ECS::EntityId unit = ECS::Entities.newEntity();
-    auto gc = ECS::Entities.addComponent<GraphicsComponent>(unit);
+    ECS::EntityId unit = Entities.newEntity();
+    auto gc = Entities.addComponent<GraphicsComponent>(unit);
     gc->setTextureName("unit");
     gc->setFileName("img/unit.png");
-    auto pc = ECS::Entities.addComponent<PositionComponent>(unit, x, y, 0);
-    ECS::Entities.addComponent<PlayerComponent>(unit);
+    auto pc = Entities.addComponent<PositionComponent>(unit, x, y, 0);
+    Entities.addComponent<PlayerComponent>(unit);
 }
 
 BattleState::BattleState(Game *g)
@@ -54,28 +54,28 @@ BattleState::BattleState(Game *g)
         w = s.size();
         for (int x = 0; x < s.size(); ++x)
         {
-            if (s[x] == 'U') create_unit(TITLE*x, TITLE*y);
-            else if (s[x] == '#') create_wall(TITLE*x, TITLE*y);
-            else if (s[x] == 'P') create_player(TITLE*x, TITLE*y);
+            if (s[x] == 'U') create_unit(Entities, TITLE*x, TITLE*y);
+            else if (s[x] == '#') create_wall(Entities, TITLE*x, TITLE*y);
+            else if (s[x] == 'P') create_player(Entities, TITLE*x, TITLE*y);
         }
         y++;
     }
-    for (auto [ent, c] : ECS::Entities.getEntitiesByComponent<GraphicsComponent>())
+    for (auto [ent, c] : Entities.getEntitiesByComponent<GraphicsComponent>())
     {
         GraphicsComponent *gc = (GraphicsComponent*)(c);
         if (!game->texman.getTexture(gc->getTextureName()))
             game->texman.loadTexture(gc->getTextureName(), gc->getFileName());
         gc->getSprite().setTexture(*game->texman.getTexture(gc->getTextureName()));
     }
-    if (ECS::Entities.getEntitiesByComponent<PlayerComponent>().empty())
+    if (Entities.getEntitiesByComponent<PlayerComponent>().empty())
     {
         view.setSize(sf::Vector2f(TITLE*w, TITLE*y));
         view.setCenter(TITLE*w * 0.5f, TITLE*y*0.5f);
     } else
     {
         view.setSize(2*TITLE*VIEW_RANGE, 2*TITLE*VIEW_RANGE);
-        auto [ent, c] = *ECS::Entities.getEntitiesByComponent<PlayerComponent>().begin();
-        auto pc = ECS::Entities.getComponent<PositionComponent>(ent);
+        auto [ent, c] = *Entities.getEntitiesByComponent<PlayerComponent>().begin();
+        auto pc = Entities.getComponent<PositionComponent>(ent);
         view.setCenter(pc->getX(), pc->getY());
     }
 }
@@ -83,10 +83,10 @@ BattleState::BattleState(Game *g)
 void BattleState::draw(float dt)
 {
     game->window.setView(view);
-    for (auto [id, gcc] : ECS::Entities.getEntitiesByComponent<GraphicsComponent>())
+    for (auto [id, gcc] : Entities.getEntitiesByComponent<GraphicsComponent>())
     {
-        auto pc = ECS::Entities.getComponent<PositionComponent>(id);
-        auto gc = ECS::Entities.getComponent<GraphicsComponent>(id);
+        auto pc = Entities.getComponent<PositionComponent>(id);
+        auto gc = Entities.getComponent<GraphicsComponent>(id);
         if (pc)
         {
             gc->getSprite().setPosition(pc->getX(), pc->getY());

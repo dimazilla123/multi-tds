@@ -7,7 +7,7 @@
 
 namespace ECS
 {
-    EntityManager Entities;
+    //EntityManager Entities;
 };
 
 #endif
