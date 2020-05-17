@@ -2,6 +2,7 @@
 #include "graphics_component.h"
 #include "position_component.h"
 #include "player_component.h"
+#include "velocity_component.h"
 #include "ECS.h"
 
 #include <SFML/Window.hpp>
@@ -21,6 +22,8 @@ void create_unit(ECS::EntityManager &Entities, float x, float y)
     gc->setTextureName("unit");
     gc->setFileName("img/unit.png");
     auto pc = Entities.addComponent<PositionComponent>(unit, x, y, 0);
+    VelocityComponent *mc = Entities.addComponent<VelocityComponent>(unit);
+    mc->setMove(sf::Vector2f(10, 0));
 }
 
 void create_wall(ECS::EntityManager &Entities, float x, float y)
@@ -41,6 +44,7 @@ void create_player(ECS::EntityManager &Entities, float x, float y)
     gc->getSprite().setColor(sf::Color(0, 255, 0));
     auto pc = Entities.addComponent<PositionComponent>(unit, x, y, 0);
     Entities.addComponent<PlayerComponent>(unit);
+    Entities.addComponent<VelocityComponent>(unit);
 }
 
 BattleState::BattleState(Game *g)
@@ -105,6 +109,14 @@ void BattleState::draw(float dt)
 
 void BattleState::update(float dt)
 {
+    for (auto [ent, c] : Entities.getEntitiesByComponent<VelocityComponent>())
+    {
+        VelocityComponent *mc = (VelocityComponent*)(c);
+        PositionComponent *pc = Entities.getComponent<PositionComponent>(ent);
+        pc->setX(pc->getX() + mc->getMove().x * dt);
+        pc->setY(pc->getY() + mc->getMove().y * dt);
+        pc->setA(-180 / std::acos(-1) * std::atan2(mc->getMove().x, mc->getMove().y));
+    }
     if (move_engines)
     {
         PositionComponent *pc = Entities.getComponent<PositionComponent>(player);
@@ -119,6 +131,7 @@ void BattleState::handleInput()
 {
     sf::Event e;
     PositionComponent *pc = Entities.getComponent<PositionComponent>(player);
+    VelocityComponent *mc = Entities.getComponent<VelocityComponent>(player);
     while (game->window.pollEvent(e))
     {
         switch (e.type)
@@ -133,12 +146,14 @@ void BattleState::handleInput()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             {
                 move_engines = true;
+                mc->setMove(100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y));
                 std::cerr << "Key pressed" << "\n";
             }
             case sf::Event::KeyReleased:
             if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             {
                 move_engines = false;
+                mc->setMove(sf::Vector2f(0, 0));
                 std::cerr << "Key released" << "\n";
             }
             break;
@@ -147,7 +162,7 @@ void BattleState::handleInput()
             sf::Vector2f cur = {pc->getX(), pc->getY()};
             direction = (mouse_pos - cur);
             direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y);
-            pc->setA(-180 / std::acos(-1) * std::atan2(direction.x, direction.y));
+            //pc->setA(-180 / std::acos(-1) * std::atan2(direction.x, direction.y));
             break;
         }
     }

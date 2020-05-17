@@ -17,6 +17,7 @@ set(GAME_SRC
     src/texture_manager.cpp
     src/battle_state.cpp
     src/graphics_component.cpp
+    src/velocity_component.cpp
     )
 
 add_executable(game ${GAME_SRC})
