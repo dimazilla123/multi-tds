@@ -18,8 +18,6 @@ private:
     sf::View view;
     ECS::EntityId player = -1;
     ECS::EntityManager Entities;
-    bool move_engines = false;
-    int rotate = 0;
     sf::Vector2f direction = sf::Vector2f(0, 1);
 };
 
