@@ -1,6 +1,7 @@
 #include "position_component.h"
+#include <cmath>
 
-PositionComponent::PositionComponent(float x, float y, float a) : x(x), y(y), z(z), a(a)
+PositionComponent::PositionComponent(float x, float y, float a) : x(x), y(y), a(a)
 {
 
 }
@@ -28,4 +29,14 @@ void PositionComponent::setY(float v)
 void PositionComponent::setA(float v)
 {
     a = v;
+}
+
+sf::Vector2f PositionComponent::getPosition() const
+{
+    return sf::Vector2f(x, y);
+}
+
+sf::Vector2f PositionComponent::getDirection() const
+{
+    return sf::Vector2f(sin(a / 360 * std::acos(-1)), cos(a / 360 * std::acos(-1)));
 }
