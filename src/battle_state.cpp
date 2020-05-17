@@ -115,7 +115,8 @@ void BattleState::update(float dt)
         PositionComponent *pc = Entities.getComponent<PositionComponent>(ent);
         pc->setX(pc->getX() + mc->getMove().x * dt);
         pc->setY(pc->getY() + mc->getMove().y * dt);
-        pc->setA(-180 / std::acos(-1) * std::atan2(mc->getMove().x, mc->getMove().y));
+        if (std::abs(mc->getMove().x) + std::abs(mc->getMove().y) > 1e-3)
+            pc->setA(-180 / std::acos(-1) * std::atan2(mc->getMove().x, mc->getMove().y));
     }
     if (move_engines)
     {
