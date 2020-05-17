@@ -1,6 +1,6 @@
 #include "position_component.h"
 
-PositionComponent::PositionComponent(float x, float y, float z) : x(x), y(y), z(z)
+PositionComponent::PositionComponent(float x, float y, float z, float a) : x(x), y(y), z(z), a(a)
 {
 
 }
@@ -16,6 +16,10 @@ float PositionComponent::getZ() const
 {
     return z;
 }
+float PositionComponent::getA() const
+{
+    return a;
+}
 
 void PositionComponent::setX(float v)
 {
@@ -28,4 +32,8 @@ void PositionComponent::setY(float v)
 void PositionComponent::setZ(float v)
 {
     z = v;
+}
+void PositionComponent::setA(float v)
+{
+    a = v;
 }

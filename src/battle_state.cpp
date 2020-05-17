@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 const int TITLE = 16;
 
@@ -37,6 +38,7 @@ void create_player(ECS::EntityManager &Entities, float x, float y)
     auto gc = Entities.addComponent<GraphicsComponent>(unit);
     gc->setTextureName("unit");
     gc->setFileName("img/unit.png");
+    gc->getSprite().setColor(sf::Color(0, 255, 0));
     auto pc = Entities.addComponent<PositionComponent>(unit, x, y, 0);
     Entities.addComponent<PlayerComponent>(unit);
 }
@@ -66,22 +68,27 @@ BattleState::BattleState(Game *g)
         if (!game->texman.getTexture(gc->getTextureName()))
             game->texman.loadTexture(gc->getTextureName(), gc->getFileName());
         gc->getSprite().setTexture(*game->texman.getTexture(gc->getTextureName()));
+        gc->getSprite().setOrigin(TITLE * 0.5f, TITLE * 0.5f);
     }
     if (Entities.getEntitiesByComponent<PlayerComponent>().empty())
     {
-        view.setSize(sf::Vector2f(TITLE*w, TITLE*y));
+        //view.setSize(sf::Vector2f(TITLE*w, TITLE*y));
         view.setCenter(TITLE*w * 0.5f, TITLE*y*0.5f);
     } else
     {
-        view.setSize(2*TITLE*VIEW_RANGE, 2*TITLE*VIEW_RANGE);
         auto [ent, c] = *Entities.getEntitiesByComponent<PlayerComponent>().begin();
         auto pc = Entities.getComponent<PositionComponent>(ent);
         view.setCenter(pc->getX(), pc->getY());
+        player = ent;
     }
 }
 
 void BattleState::draw(float dt)
 {
+    if (auto pc = Entities.getComponent<PositionComponent>(player))
+    {
+        view.setCenter(pc->getX(), pc->getY());
+    }
     game->window.setView(view);
     for (auto [id, gcc] : Entities.getEntitiesByComponent<GraphicsComponent>())
     {
@@ -90,6 +97,7 @@ void BattleState::draw(float dt)
         if (pc)
         {
             gc->getSprite().setPosition(pc->getX(), pc->getY());
+            gc->getSprite().setRotation(pc->getA());
             game->window.draw(gc->getSprite());
         }
     }
@@ -97,11 +105,20 @@ void BattleState::draw(float dt)
 
 void BattleState::update(float dt)
 {
+    if (move_engines)
+    {
+        PositionComponent *pc = Entities.getComponent<PositionComponent>(player);
+        const float v = 100;
+        sf::Vector2f d = v * direction * dt;
+        pc->setX(pc->getX() + d.x);
+        pc->setY(pc->getY() + d.y);
+    }
 }
 
 void BattleState::handleInput()
 {
     sf::Event e;
+    PositionComponent *pc = Entities.getComponent<PositionComponent>(player);
     while (game->window.pollEvent(e))
     {
         switch (e.type)
@@ -109,18 +126,28 @@ void BattleState::handleInput()
             case sf::Event::Closed:
             game->window.close();
             break;
-            //case sf::Event::Resized:
-            //view.setSize(sf::Vector2f(game->window.getSize()));
-            //break;
+            case sf::Event::Resized:
+            view.setSize(sf::Vector2f(game->window.getSize()));
+            break;
             case sf::Event::KeyPressed:
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                view.move(-TITLE, 0);
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                view.move(TITLE, 0);
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                view.move(0, -TITLE);
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                view.move(0, TITLE);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                move_engines = true;
+                std::cerr << "Key pressed" << "\n";
+            }
+            case sf::Event::KeyReleased:
+            if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                move_engines = false;
+                std::cerr << "Key released" << "\n";
+            }
+            break;
+            case sf::Event::MouseMoved:
+            sf::Vector2f mouse_pos = game->window.mapPixelToCoords(sf::Mouse::getPosition(game->window));
+            sf::Vector2f cur = {pc->getX(), pc->getY()};
+            direction = (mouse_pos - cur);
+            direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y);
+            pc->setA(-180 / std::acos(-1) * std::atan2(direction.x, direction.y));
             break;
         }
     }
