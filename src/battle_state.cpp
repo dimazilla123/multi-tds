@@ -85,6 +85,7 @@ BattleState::BattleState(Game *g)
         view.setCenter(pc->getX(), pc->getY());
         player = ent;
     }
+    f.close();
 }
 
 void BattleState::draw(float dt)
@@ -146,6 +147,18 @@ void BattleState::handleInput()
             {
                 mc->setMove(sf::Vector2f(0, 0));
                 std::cerr << "Key released" << "\n";
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
+            {
+                std::ofstream s("save.dat");
+                Entities.save(s);
+                s.close();
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y))
+            {
+                std::ifstream s("save.dat");
+                Entities.load(s);
+                s.close();
             }
             break;
             case sf::Event::MouseMoved:

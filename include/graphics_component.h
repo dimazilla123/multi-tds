@@ -14,6 +14,8 @@ public:
     std::string getFileName() const;
     void setTextureName(const std::string &s);
     void setFileName(const std::string &s);
+    void save(std::ostream &out) const;
+    void load(std::istream &in);
 private:
     sf::Sprite sprite;
     std::string tex_name;

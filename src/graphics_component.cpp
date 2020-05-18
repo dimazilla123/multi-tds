@@ -1,7 +1,18 @@
 #include "graphics_component.h"
+#include "binutils.h"
 
 GraphicsComponent::GraphicsComponent()
 {
+}
+
+void GraphicsComponent::save(std::ostream &out) const
+{
+    binutils::write(out, *this);
+}
+
+void GraphicsComponent::load(std::istream &in)
+{
+    binutils::read(in, *this);
 }
 
 std::string GraphicsComponent::getTextureName() const

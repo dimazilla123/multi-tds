@@ -11,6 +11,8 @@ public:
     //~VelocityComponent();
     sf::Vector2f getMove() const;
     void setMove(sf::Vector2f v);
+    void save(std::ostream &out) const;
+    void load(std::istream &in);
 private:
     sf::Vector2f move = sf::Vector2f(0, 0);
 };

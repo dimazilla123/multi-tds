@@ -1,4 +1,5 @@
 #include "position_component.h"
+#include "binutils.h"
 #include <cmath>
 
 PositionComponent::PositionComponent(float x, float y, float a) : x(x), y(y), a(a)
@@ -39,4 +40,14 @@ sf::Vector2f PositionComponent::getPosition() const
 sf::Vector2f PositionComponent::getDirection() const
 {
     return sf::Vector2f(sin(a / 360 * std::acos(-1)), cos(a / 360 * std::acos(-1)));
+}
+
+void PositionComponent::save(std::ostream &out) const
+{
+    binutils::write(out, *this);
+}
+
+void PositionComponent::load(std::istream &in)
+{
+    binutils::read(in, *this);
 }

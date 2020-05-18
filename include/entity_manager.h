@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <set>
 #include <typeindex>
+#include <iostream>
 
 #include "component.h"
 
@@ -34,6 +35,8 @@ namespace ECS
         {
             return comps[std::type_index(typeid(CompT))];
         }
+        void save(std::ostream &out) const;
+        void load(std::istream &in);
     private:
         std::set<EntityId> ids;
         std::unordered_map<std::type_index, std::unordered_map<EntityId, Component*>> comps;

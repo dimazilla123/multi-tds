@@ -18,6 +18,9 @@ set(GAME_SRC
     src/battle_state.cpp
     src/graphics_component.cpp
     src/velocity_component.cpp
+    src/component.cpp
+    src/component_factory.cpp
+    src/player_component.cpp
     )
 
 add_executable(game ${GAME_SRC})

@@ -7,7 +7,10 @@
 class PositionComponent : public ECS::Component
 {
 public:
+    PositionComponent() {};
     PositionComponent(float x, float y, float a=0);
+    void save(std::ostream &out) const;
+    void load(std::istream &in);
     float getX() const;
     void setX(float v);
     float getY() const;
