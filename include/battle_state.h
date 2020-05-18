@@ -14,6 +14,8 @@ public:
     virtual void draw(float dt);
     virtual void update(float dt);
     virtual void handleInput();
+
+    void loadTextures();
 private:
     sf::View view;
     ECS::EntityId player = -1;

@@ -47,6 +47,18 @@ void create_player(ECS::EntityManager &Entities, float x, float y)
     Entities.addComponent<VelocityComponent>(unit);
 }
 
+void BattleState::loadTextures()
+{
+    for (auto [ent, c] : Entities.getEntitiesByComponent<GraphicsComponent>())
+    {
+        GraphicsComponent *gc = (GraphicsComponent*)(c);
+        if (!game->texman.getTexture(gc->getTextureName()))
+            game->texman.loadTexture(gc->getTextureName(), gc->getFileName());
+        gc->getSprite().setTexture(*game->texman.getTexture(gc->getTextureName()));
+        gc->getSprite().setOrigin(TITLE * 0.5f, TITLE * 0.5f);
+    }
+}
+
 BattleState::BattleState(Game *g)
 {
     game = g;
@@ -66,14 +78,7 @@ BattleState::BattleState(Game *g)
         }
         y++;
     }
-    for (auto [ent, c] : Entities.getEntitiesByComponent<GraphicsComponent>())
-    {
-        GraphicsComponent *gc = (GraphicsComponent*)(c);
-        if (!game->texman.getTexture(gc->getTextureName()))
-            game->texman.loadTexture(gc->getTextureName(), gc->getFileName());
-        gc->getSprite().setTexture(*game->texman.getTexture(gc->getTextureName()));
-        gc->getSprite().setOrigin(TITLE * 0.5f, TITLE * 0.5f);
-    }
+    loadTextures();
     if (Entities.getEntitiesByComponent<PlayerComponent>().empty())
     {
         //view.setSize(sf::Vector2f(TITLE*w, TITLE*y));
@@ -158,6 +163,7 @@ void BattleState::handleInput()
             {
                 std::ifstream s("save.dat");
                 Entities.load(s);
+                loadTextures();
                 s.close();
             }
             break;

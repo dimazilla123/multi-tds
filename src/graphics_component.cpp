@@ -7,12 +7,14 @@ GraphicsComponent::GraphicsComponent()
 
 void GraphicsComponent::save(std::ostream &out) const
 {
-    binutils::write(out, *this);
+    binutils::write(out, tex_name);
+    binutils::write(out, filename);
 }
 
 void GraphicsComponent::load(std::istream &in)
 {
-    binutils::read(in, *this);
+    binutils::read(in, tex_name);
+    binutils::read(in, filename);
 }
 
 std::string GraphicsComponent::getTextureName() const
