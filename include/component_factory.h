@@ -51,7 +51,7 @@ namespace ComponentFactory
     {
         return static_cast<ECS::Component*>(new T);
     }
-    ECS::Component *make(std::type_index ind);
+    ECS::Component *make(size_t ind);
 };
 
 #endif

@@ -5,6 +5,8 @@
 #include "velocity_component.h"
 #include "ECS.h"
 
+#include "binutils.h"
+
 #include <SFML/Window.hpp>
 
 #include <iostream>
@@ -33,6 +35,8 @@ void create_wall(ECS::EntityManager &Entities, float x, float y)
     gc->setTextureName("wall");
     gc->setFileName("img/wall.png");
     auto pc = Entities.addComponent<PositionComponent>(unit, x, y);
+    VelocityComponent *mc = Entities.addComponent<VelocityComponent>(unit);
+    mc->setMove(sf::Vector2f(10, 10));
 }
 
 void create_player(ECS::EntityManager &Entities, float x, float y)

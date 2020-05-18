@@ -3,12 +3,12 @@
 
 void VelocityComponent::save(std::ostream &out) const
 {
-    binutils::write(out, *this);
+    binutils::write(out, move);
 }
 
 void VelocityComponent::load(std::istream &in)
 {
-    binutils::read(in, *this);
+    binutils::read(in, move);
 }
 
 sf::Vector2f VelocityComponent::getMove() const

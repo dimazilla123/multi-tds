@@ -73,7 +73,7 @@ namespace ECS
         {
             size_t pairsz;
             binutils::read(in, pairsz);
-            std::type_index type = std::type_index(typeid(sz)); // random type_index
+            size_t type;
             binutils::read(in, type);
             for (int i = 0; i < pairsz; ++i)
             {
