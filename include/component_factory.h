@@ -13,39 +13,6 @@
 
 namespace ComponentFactory
 {
-    class Factoy
-    {
-    public:
-        virtual ECS::Component *make() const = 0;
-    };
-    class PositionFactory : public Factoy
-    {
-        ECS::Component *make()
-        {
-            return new PositionComponent;
-        }
-    };
-    class GraphicsFactory : public Factoy
-    {
-        ECS::Component *make()
-        {
-            return new GraphicsComponent;
-        }
-    };
-    class PlayerFactory : public Factoy
-    {
-        ECS::Component *make()
-        {
-            return new PlayerComponent;
-        }
-    };
-    class VelocityFactory : public Factoy
-    {
-        ECS::Component *make()
-        {
-            return new VelocityComponent;
-        }
-    };
     template<typename T>
     ECS::Component *templ_make()
     {
