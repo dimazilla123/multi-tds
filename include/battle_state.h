@@ -21,6 +21,7 @@ private:
     ECS::EntityId player = -1;
     ECS::EntityManager Entities;
     sf::Vector2f direction = sf::Vector2f(0, 1);
+    bool space_is_pressed = false;
 };
 
 #endif

@@ -35,8 +35,8 @@ void create_wall(ECS::EntityManager &Entities, float x, float y)
     gc->setTextureName("wall");
     gc->setFileName("img/wall.png");
     auto pc = Entities.addComponent<PositionComponent>(unit, x, y);
-    VelocityComponent *mc = Entities.addComponent<VelocityComponent>(unit);
-    mc->setMove(sf::Vector2f(10, 10));
+    //VelocityComponent *mc = Entities.addComponent<VelocityComponent>(unit);
+    //mc->setMove(sf::Vector2f(10, 10));
 }
 
 void create_player(ECS::EntityManager &Entities, float x, float y)
@@ -125,8 +125,8 @@ void BattleState::update(float dt)
         PositionComponent *pc = Entities.getComponent<PositionComponent>(ent);
         pc->setX(pc->getX() + mc->getMove().x * dt);
         pc->setY(pc->getY() + mc->getMove().y * dt);
-        if (std::abs(mc->getMove().x) + std::abs(mc->getMove().y) > 1e-3)
-            pc->setA(-180 / std::acos(-1) * std::atan2(mc->getMove().x, mc->getMove().y));
+        //if (std::abs(mc->getMove().x) + std::abs(mc->getMove().y) > 1e-3)
+        //    pc->setA(-180 / std::acos(-1) * std::atan2(mc->getMove().x, mc->getMove().y));
     }
 }
 
@@ -148,13 +148,13 @@ void BattleState::handleInput()
             case sf::Event::KeyPressed:
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             {
-                mc->setMove(100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y));
+                space_is_pressed = true;
                 std::cerr << "Key pressed" << "\n";
             }
             case sf::Event::KeyReleased:
             if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             {
-                mc->setMove(sf::Vector2f(0, 0));
+                space_is_pressed = false;
                 std::cerr << "Key released" << "\n";
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
@@ -171,13 +171,13 @@ void BattleState::handleInput()
                 s.close();
             }
             break;
-            case sf::Event::MouseMoved:
-            sf::Vector2f mouse_pos = game->window.mapPixelToCoords(sf::Mouse::getPosition(game->window));
-            sf::Vector2f cur = {pc->getX(), pc->getY()};
-            direction = (mouse_pos - cur);
-            direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y);
-            //pc->setA(-180 / std::acos(-1) * std::atan2(direction.x, direction.y));
-            break;
         }
     }
+    if (space_is_pressed) mc->setMove(100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y));
+    else mc->setMove({0, 0});
+    sf::Vector2f mouse_pos = game->window.mapPixelToCoords(sf::Mouse::getPosition(game->window));
+    sf::Vector2f cur = {pc->getX(), pc->getY()};
+    direction = (mouse_pos - cur);
+    direction /= std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    pc->setA(-180 / std::acos(-1) * std::atan2(direction.x, direction.y));
 }
