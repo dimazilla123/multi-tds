@@ -3,7 +3,12 @@
 #include "position_component.h"
 #include "player_component.h"
 #include "velocity_component.h"
+#include "gravity_component.h"
 #include "ECS.h"
+
+#include "graphics_system.h"
+#include "velocity_system.h"
+#include "gravity_system.h"
 
 #include "binutils.h"
 
@@ -49,6 +54,15 @@ void create_player(ECS::EntityManager &Entities, float x, float y)
     auto pc = Entities.addComponent<PositionComponent>(unit, x, y);
     Entities.addComponent<PlayerComponent>(unit);
     Entities.addComponent<VelocityComponent>(unit);
+    Entities.addComponent<GravityComponent>(unit, 1, 0);
+}
+
+void create_planet(ECS::EntityManager &Entities, float x, float y, float m, float r)
+{
+    ECS::EntityId unit = Entities.newEntity();
+    auto pc = Entities.addComponent<PositionComponent>(unit, x, y);
+    Entities.addComponent<PlayerComponent>(unit);
+    Entities.addComponent<GravityComponent>(unit, m, r);
 }
 
 void BattleState::loadTextures()
@@ -79,6 +93,7 @@ BattleState::BattleState(Game *g)
             if (s[x] == 'U') create_unit(Entities, TITLE*x, TITLE*y);
             else if (s[x] == '#') create_wall(Entities, TITLE*x, TITLE*y);
             else if (s[x] == 'P') create_player(Entities, TITLE*x, TITLE*y);
+            else if (s[x] == 'R') create_planet(Entities, TITLE*x, TITLE*y, 100000, TITLE*4);
         }
         y++;
     }
@@ -95,42 +110,37 @@ BattleState::BattleState(Game *g)
         player = ent;
     }
     f.close();
+    systems.push_back(new GravitySystem());
+    systems.push_back(new VelocitySystem());
+}
+
+BattleState::~BattleState()
+{
+    while (!systems.empty())
+    {
+        delete systems.back();
+        systems.pop_back();
+    }
 }
 
 void BattleState::draw(float dt)
 {
+    static GraphicsSystem gs;
+    game->window.setView(view);
     if (auto pc = Entities.getComponent<PositionComponent>(player))
     {
         view.setCenter(pc->getX(), pc->getY());
     }
-    game->window.setView(view);
-    for (auto [id, gcc] : Entities.getEntitiesByComponent<GraphicsComponent>())
-    {
-        auto pc = Entities.getComponent<PositionComponent>(id);
-        auto gc = Entities.getComponent<GraphicsComponent>(id);
-        if (pc)
-        {
-            gc->getSprite().setPosition(pc->getX(), pc->getY());
-            gc->getSprite().setRotation(pc->getA());
-            game->window.draw(gc->getSprite());
-        }
-    }
+    gs.update(game, Entities, dt);
 }
 
 void BattleState::update(float dt)
 {
-    for (auto [ent, c] : Entities.getEntitiesByComponent<VelocityComponent>())
-    {
-        VelocityComponent *mc = (VelocityComponent*)(c);
-        PositionComponent *pc = Entities.getComponent<PositionComponent>(ent);
-        pc->setX(pc->getX() + mc->getMove().x * dt);
-        pc->setY(pc->getY() + mc->getMove().y * dt);
-        //if (std::abs(mc->getMove().x) + std::abs(mc->getMove().y) > 1e-3)
-        //    pc->setA(-180 / std::acos(-1) * std::atan2(mc->getMove().x, mc->getMove().y));
-    }
+    for (auto s : systems)
+        s->update(game, Entities, dt);
 }
 
-void BattleState::handleInput()
+void BattleState::handleInput(float dt)
 {
     sf::Event e;
     PositionComponent *pc = Entities.getComponent<PositionComponent>(player);
@@ -173,8 +183,8 @@ void BattleState::handleInput()
             break;
         }
     }
-    if (space_is_pressed) mc->setMove(100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y));
-    else mc->setMove({0, 0});
+    if (space_is_pressed) mc->setMove(mc->getMove() + 100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y) * dt);
+    //else mc->setMove({0, 0});
     sf::Vector2f mouse_pos = game->window.mapPixelToCoords(sf::Mouse::getPosition(game->window));
     sf::Vector2f cur = {pc->getX(), pc->getY()};
     direction = (mouse_pos - cur);

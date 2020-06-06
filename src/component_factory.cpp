@@ -1,4 +1,9 @@
 #include "component_factory.h"
+#include "position_component.h"
+#include "graphics_component.h"
+#include "player_component.h"
+#include "velocity_component.h"
+#include "gravity_component.h"
 #include <functional>
 
 ECS::Component *ComponentFactory::make(size_t ind)
@@ -14,7 +19,8 @@ ECS::Component *ComponentFactory::make(size_t ind)
         {typeid(PositionComponent).hash_code(), ComponentFactory::templ_make<PositionComponent>},
         {typeid(GraphicsComponent).hash_code(), ComponentFactory::templ_make<GraphicsComponent>},
         {typeid(PlayerComponent).hash_code(), ComponentFactory::templ_make<PlayerComponent>},
-        {typeid(VelocityComponent).hash_code(), ComponentFactory::templ_make<VelocityComponent>}
+        {typeid(VelocityComponent).hash_code(), ComponentFactory::templ_make<VelocityComponent>},
+        {typeid(GravityComponent).hash_code(), ComponentFactory::templ_make<GravityComponent>},
     }
     );
     return (ECS::Component*)(cnstrctsrs[ind]());

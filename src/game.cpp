@@ -46,7 +46,7 @@ void Game::gameLoop()
         float dt = passed.asSeconds();
         if (!peekState())
             continue;
-        peekState()->handleInput();
+        peekState()->handleInput(dt);
         peekState()->update(dt);
         window.clear();
         peekState()->draw(dt);

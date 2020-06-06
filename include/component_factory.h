@@ -6,11 +6,6 @@
 
 #include "component.h"
 
-#include "position_component.h"
-#include "graphics_component.h"
-#include "player_component.h"
-#include "velocity_component.h"
-
 namespace ComponentFactory
 {
     template<typename T>

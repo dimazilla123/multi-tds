@@ -6,6 +6,8 @@
 
 #include "ECS.h"
 
+#include <vector>
+
 class BattleState : public GameState
 {
 public:
@@ -13,7 +15,7 @@ public:
     ~BattleState();
     virtual void draw(float dt);
     virtual void update(float dt);
-    virtual void handleInput();
+    virtual void handleInput(float dt);
 
     void loadTextures();
 private:
@@ -22,6 +24,8 @@ private:
     ECS::EntityManager Entities;
     sf::Vector2f direction = sf::Vector2f(0, 1);
     bool space_is_pressed = false;
+
+    std::vector<ECS::System*> systems;
 };
 
 #endif

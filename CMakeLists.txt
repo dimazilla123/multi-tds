@@ -21,7 +21,11 @@ set(GAME_SRC
     src/component.cpp
     src/component_factory.cpp
     src/player_component.cpp
+    src/gravity_component.cpp
     src/binutils.cpp
+    src/graphics_system.cpp
+    src/velocity_system.cpp
+    src/gravity_system.cpp
     )
 
 add_executable(game ${GAME_SRC})

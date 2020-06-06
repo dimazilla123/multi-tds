@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "entity_manager.h"
+#include "system.h"
 
 namespace ECS
 {
