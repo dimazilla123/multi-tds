@@ -163,18 +163,37 @@ void BattleState::handleInput(float dt)
                 break;
         }
     }
-    if (is_pressed[sf::Keyboard::Key::T])
+    const sf::Keyboard::Key nums[] = {
+        sf::Keyboard::Key::Num0,
+        sf::Keyboard::Key::Num1,
+        sf::Keyboard::Key::Num2,
+        sf::Keyboard::Key::Num3,
+        sf::Keyboard::Key::Num4,
+        sf::Keyboard::Key::Num5,
+        sf::Keyboard::Key::Num6,
+        sf::Keyboard::Key::Num7,
+        sf::Keyboard::Key::Num8,
+        sf::Keyboard::Key::Num9
+    };
+    for (int i = 0; i < 10; ++i)
     {
-        std::ofstream s("save.dat");
-        Entities.save(s);
-        s.close();
-    }
-    if (is_pressed[sf::Keyboard::Key::Y])
-    {
-        std::ifstream s("save.dat");
-        Entities.load(s);
-        loadTextures();
-        s.close();
+        std::string filename = "0.dat";
+        filename[0] += i;
+        if (is_pressed[nums[i]])
+        {
+            if (is_pressed[sf::Keyboard::Key::LShift])
+            {
+                std::ifstream s(filename);
+                Entities.load(s);
+                loadTextures();
+                s.close();
+            } else
+            {
+                std::ofstream s(filename);
+                Entities.save(s);
+                s.close();
+            }
+        }
     }
     if (is_pressed[sf::Keyboard::Key::Space]) mc->setMove(mc->getMove() + 100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y) * dt);
     //else mc->setMove({0, 0});
