@@ -77,6 +77,12 @@ void BattleState::loadTextures()
     }
 }
 
+void BattleState::writeMessage(const std::string &s, const sf::Color c)
+{
+    message.setString(s);
+    message.setFillColor(c);
+}
+
 BattleState::BattleState(Game *g)
 {
     game = g;
@@ -112,6 +118,12 @@ BattleState::BattleState(Game *g)
     f.close();
     systems.push_back(new GravitySystem());
     systems.push_back(new VelocitySystem());
+
+    font.loadFromFile("fonts/ter-u22b.otb");
+    message.setFont(font);
+    message.setCharacterSize(22);
+    message.setString("Press number key to save to slot or shift+num to load");
+    message.setFillColor(sf::Color::Green);
 }
 
 BattleState::~BattleState()
@@ -132,6 +144,8 @@ void BattleState::draw(float dt)
         view.setCenter(pc->getX(), pc->getY());
     }
     gs.update(game, Entities, dt);
+    message.setPosition(game->window.mapPixelToCoords(sf::Vector2i(0, 0)));
+    game->window.draw(message);
 }
 
 void BattleState::update(float dt)
@@ -184,12 +198,28 @@ void BattleState::handleInput(float dt)
             if (is_pressed[sf::Keyboard::Key::LShift])
             {
                 std::ifstream s(filename);
+                if (!s.is_open())
+                {
+                    writeMessage("Cannot open save slot to load!", sf::Color::Red);
+                    continue;
+                } else
+                {
+                    writeMessage("Loaded from slot");
+                }
                 Entities.load(s);
                 loadTextures();
                 s.close();
             } else
             {
                 std::ofstream s(filename);
+                if (!s.is_open())
+                {
+                    writeMessage("Cannot open save slot to save!", sf::Color::Red);
+                    continue;
+                } else
+                {
+                    writeMessage("Saved to slot");
+                }
                 Entities.save(s);
                 s.close();
             }
