@@ -7,6 +7,7 @@
 #include "ECS.h"
 
 #include <vector>
+#include <unordered_map>
 
 class BattleState : public GameState
 {
@@ -23,6 +24,10 @@ private:
     ECS::EntityId player = -1;
     ECS::EntityManager Entities;
     sf::Vector2f direction = sf::Vector2f(0, 1);
+
+    std::unordered_map<sf::Keyboard::Key, bool> is_pressed;
+
+    bool shift_is_pressed = false;
     bool space_is_pressed = false;
 
     std::vector<ECS::System*> systems;

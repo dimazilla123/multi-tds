@@ -150,40 +150,33 @@ void BattleState::handleInput(float dt)
         switch (e.type)
         {
             case sf::Event::Closed:
-            game->window.close();
-            break;
+                game->window.close();
+                break;
             case sf::Event::Resized:
-            view.setSize(sf::Vector2f(game->window.getSize()));
-            break;
+                view.setSize(sf::Vector2f(game->window.getSize()));
+                break;
             case sf::Event::KeyPressed:
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-            {
-                space_is_pressed = true;
-                std::cerr << "Key pressed" << "\n";
-            }
+                is_pressed[e.key.code] = true;
+                break;
             case sf::Event::KeyReleased:
-            if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-            {
-                space_is_pressed = false;
-                std::cerr << "Key released" << "\n";
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
-            {
-                std::ofstream s("save.dat");
-                Entities.save(s);
-                s.close();
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y))
-            {
-                std::ifstream s("save.dat");
-                Entities.load(s);
-                loadTextures();
-                s.close();
-            }
-            break;
+                is_pressed[e.key.code] = false;
+                break;
         }
     }
-    if (space_is_pressed) mc->setMove(mc->getMove() + 100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y) * dt);
+    if (is_pressed[sf::Keyboard::Key::T])
+    {
+        std::ofstream s("save.dat");
+        Entities.save(s);
+        s.close();
+    }
+    if (is_pressed[sf::Keyboard::Key::Y])
+    {
+        std::ifstream s("save.dat");
+        Entities.load(s);
+        loadTextures();
+        s.close();
+    }
+    if (is_pressed[sf::Keyboard::Key::Space]) mc->setMove(mc->getMove() + 100.0f * direction / std::sqrt(direction.x * direction.x + direction.y * direction.y) * dt);
     //else mc->setMove({0, 0});
     sf::Vector2f mouse_pos = game->window.mapPixelToCoords(sf::Mouse::getPosition(game->window));
     sf::Vector2f cur = {pc->getX(), pc->getY()};
